@@ -55,9 +55,10 @@ export default function Checkout({ isOpen, onClose, product, timeLeft, selection
   };
 
   const maskPhone = (phone: string) => {
-    if (phone.length < 4) return phone;
-    const ddd = phone.slice(0, 2);
-    const last2 = phone.slice(-2);
+    const digits = phone.replace(/\D/g, '');
+    if (digits.length < 4) return digits;
+    const ddd = digits.slice(0, 2);
+    const last2 = digits.slice(-2);
     return `${ddd}*******${last2}`;
   };
 

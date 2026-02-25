@@ -24,14 +24,28 @@ export default function AddressForm({ isOpen, onClose, onSave }: AddressFormProp
   });
   const [loading, setLoading] = useState(false);
 
-  const handleCepChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const cep = e.target.value.replace(/\D/g, '');
-    setFormData(prev => ({ ...prev, cep }));
+  const formatCep = (value: string) => {
+    const digits = value.replace(/\D/g, '').slice(0, 8);
+    if (digits.length <= 5) return digits;
+    return `${digits.slice(0, 5)}-${digits.slice(5)}`;
+  };
 
-    if (cep.length === 8) {
+  const formatPhone = (value: string) => {
+    const digits = value.replace(/\D/g, '').slice(0, 11);
+    if (digits.length <= 2) return digits;
+    if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+    if (digits.length <= 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+  };
+
+  const handleCepChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const cepDigits = e.target.value.replace(/\D/g, '').slice(0, 8);
+    setFormData(prev => ({ ...prev, cep: formatCep(cepDigits) }));
+
+    if (cepDigits.length === 8) {
       setLoading(true);
       try {
-        const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+        const response = await fetch(`https://viacep.com.br/ws/${cepDigits}/json/`);
         const data = await response.json();
         
         if (!data.erro) {
@@ -53,6 +67,10 @@ export default function AddressForm({ isOpen, onClose, onSave }: AddressFormProp
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    if (name === 'phone') {
+      setFormData(prev => ({ ...prev, phone: formatPhone(value) }));
+      return;
+    }
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -65,7 +83,9 @@ export default function AddressForm({ isOpen, onClose, onSave }: AddressFormProp
 
   if (!isOpen) return null;
 
-  const isFormValid = formData.name && formData.phone && formData.cep && formData.state && formData.city && formData.address && formData.number;
+  const phoneDigits = formData.phone.replace(/\D/g, '');
+  const cepDigits = formData.cep.replace(/\D/g, '');
+  const isFormValid = formData.name && phoneDigits.length >= 10 && cepDigits.length === 8 && formData.state && formData.city && formData.address && formData.number;
 
   return (
     <AnimatePresence>
@@ -106,11 +126,12 @@ export default function AddressForm({ isOpen, onClose, onSave }: AddressFormProp
                 BR +55
               </div>
               <input 
-                type="tel" 
+                type="text" 
                 name="phone"
                 placeholder="Número de telefone" 
                 value={formData.phone}
                 onChange={handleChange}
+                maxLength={15}
                 className="flex-1 text-[14px] text-[#222222] placeholder:text-[#CCCCCC] outline-none"
               />
             </div>
@@ -137,7 +158,7 @@ export default function AddressForm({ isOpen, onClose, onSave }: AddressFormProp
                 placeholder="CEP/Código postal" 
                 value={formData.cep}
                 onChange={handleCepChange}
-                maxLength={8}
+                maxLength={9}
                 className="w-full text-[14px] text-[#222222] placeholder:text-[#CCCCCC] outline-none"
               />
               {loading && <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-[#FF2D55] border-t-transparent rounded-full animate-spin" />}

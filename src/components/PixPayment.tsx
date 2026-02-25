@@ -45,6 +45,7 @@ export default function PixPayment({ isOpen, onClose, price, quantity, customer 
   
   useEffect(() => {
     if (!isOpen) return;
+    if (pixCode || isLoadingCharge) return;
 
     const hasMissingData = !customer.name || !customer.email || !customer.phone || !customer.cpf;
     if (hasMissingData) {
@@ -73,13 +74,29 @@ export default function PixPayment({ isOpen, onClose, price, quantity, customer 
       .finally(() => {
         setIsLoadingCharge(false);
       });
-  }, [isOpen, customer, price, quantity]);
+  }, [
+    isOpen,
+    price,
+    quantity,
+    customer.name,
+    customer.email,
+    customer.phone,
+    customer.cpf,
+    pixCode,
+    isLoadingCharge,
+  ]);
 
   const handleCopy = () => {
     if (!pixCode) return;
     navigator.clipboard.writeText(pixCode);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const getPixPreview = (value: string) => {
+    if (!value) return '';
+    if (value.length <= 36) return value;
+    return `${value.slice(0, 18)}...${value.slice(-12)}`;
   };
 
   if (!isOpen) return null;
@@ -150,10 +167,10 @@ export default function PixPayment({ isOpen, onClose, price, quantity, customer 
               <span className="text-[15px] font-bold text-[#222222]">PIX</span>
             </div>
             
-            <div className="text-[18px] font-bold text-[#222222] break-all mb-8 tracking-tight">
+            <div className="text-[14px] font-semibold text-[#222222] mb-8 tracking-tight bg-[#F8F8F8] border border-gray-100 rounded-[8px] px-3 py-2">
               {isLoadingCharge && 'Gerando código PIX...'}
               {!isLoadingCharge && errorMessage && 'Erro ao gerar PIX'}
-              {!isLoadingCharge && !errorMessage && (pixCode || 'Código PIX não disponível')}
+              {!isLoadingCharge && !errorMessage && (getPixPreview(pixCode) || 'Código PIX não disponível')}
             </div>
 
             {errorMessage && (
@@ -171,15 +188,13 @@ export default function PixPayment({ isOpen, onClose, price, quantity, customer 
           </div>
 
           {/* Instructions */}
-          <p className="text-[12px] text-[#222222] leading-tight mb-10">
-            Para acessar esta página no app, abra <span className="font-bold">Loja &gt; Pedidos &gt; Sem pagamento &gt; Visualizar o código</span>
-          </p>
-
-          <div className="space-y-4">
-            <h3 className="text-[18px] font-bold text-[#222222]">Como fazer pagamentos com PIX?</h3>
-            <p className="text-[13px] text-[#222222] leading-relaxed">
-              Copie o código de pagamento acima, selecione Pix no seu app de internet ou de banco e cole o código.
-            </p>
+          <div className="space-y-4 mb-10">
+            <h3 className="text-[18px] font-bold text-[#222222]">Como pagar com PIX</h3>
+            <div className="space-y-2 text-[13px] text-[#222222] leading-relaxed">
+              <p><span className="font-bold">1.</span> Toque em <span className="font-bold">Copiar</span> para copiar o código.</p>
+              <p><span className="font-bold">2.</span> Abra o app do seu banco e escolha a opção <span className="font-bold">PIX Copia e Cola</span>.</p>
+              <p><span className="font-bold">3.</span> Cole o código, confira o valor e confirme o pagamento.</p>
+            </div>
           </div>
         </main>
 
