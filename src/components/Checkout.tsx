@@ -40,6 +40,7 @@ export default function Checkout({ isOpen, onClose, product, timeLeft, selection
   const [savedAddress, setSavedAddress] = useState<SavedAddress | null>(null);
   const [savedCPF, setSavedCPF] = useState<string | null>(null);
   const [selectedPayment, setSelectedPayment] = useState<'pix' | 'credit_card'>('pix');
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
@@ -60,6 +61,26 @@ export default function Checkout({ isOpen, onClose, product, timeLeft, selection
     const ddd = digits.slice(0, 2);
     const last2 = digits.slice(-2);
     return `${ddd}*******${last2}`;
+  };
+
+  const canProceedToPayment = Boolean(savedAddress && savedCPF);
+
+  const handlePlaceOrder = () => {
+    if (!savedAddress && !savedCPF) {
+      setCheckoutError('Preencha o endereço de envio e o CPF para continuar.');
+      return;
+    }
+    if (!savedAddress) {
+      setCheckoutError('Preencha o endereço de envio para continuar.');
+      return;
+    }
+    if (!savedCPF) {
+      setCheckoutError('Preencha o CPF para continuar.');
+      return;
+    }
+
+    setCheckoutError(null);
+    setIsPixPageOpen(true);
   };
 
   return (
@@ -335,9 +356,13 @@ export default function Checkout({ isOpen, onClose, product, timeLeft, selection
             <span className="text-[18px] font-bold text-[#FF2D55]">R$ {formatPrice(product.currentPrice * (selection?.quantity || 1))}</span>
           </div>
 
+          {checkoutError && (
+            <p className="text-[12px] text-[#FF2D55] px-1">{checkoutError}</p>
+          )}
+
           <button 
-            onClick={() => setIsPixPageOpen(true)}
-            className="w-full bg-[#FF2D55] text-white py-3 rounded-[4px] flex flex-col items-center justify-center leading-none shadow-lg active:scale-[0.98] transition-transform"
+            onClick={handlePlaceOrder}
+            className={`w-full text-white py-3 rounded-[4px] flex flex-col items-center justify-center leading-none shadow-lg transition-transform ${canProceedToPayment ? 'bg-[#FF2D55] active:scale-[0.98]' : 'bg-[#FF2D55]/70'}`}
           >
             <span className="text-[16px] font-bold mb-1">Fazer pedido</span>
             <span className="text-[11px] font-medium opacity-90">A oferta acaba em {timeLeft} | Restam 7</span>
@@ -347,13 +372,19 @@ export default function Checkout({ isOpen, onClose, product, timeLeft, selection
         <AddressForm 
           isOpen={isAddressFormOpen} 
           onClose={() => setIsAddressFormOpen(false)} 
-          onSave={(data) => setSavedAddress(data)}
+          onSave={(data) => {
+            setSavedAddress(data);
+            if (savedCPF) setCheckoutError(null);
+          }}
         />
 
         <CPFModal 
           isOpen={isCPFModalOpen} 
           onClose={() => setIsCPFModalOpen(false)} 
-          onSave={(cpf) => setSavedCPF(cpf)}
+          onSave={(cpf) => {
+            setSavedCPF(cpf);
+            if (savedAddress) setCheckoutError(null);
+          }}
         />
 
         <PixPayment 
