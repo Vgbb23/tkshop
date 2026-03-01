@@ -19,7 +19,10 @@ export default function BottomBar({ onBuyNow }: BottomBarProps) {
       </div>
 
       <div className="flex-1 flex gap-2 h-[44px]">
-        <button className="flex-1 bg-[#F5F5F5] rounded-full flex flex-col items-center justify-center leading-none">
+        <button
+          onClick={onBuyNow}
+          className="flex-1 bg-[#F5F5F5] rounded-full flex flex-col items-center justify-center leading-none"
+        >
           <span className="text-[13px] font-bold text-[#222222]">Adicionar</span>
           <span className="text-[13px] font-bold text-[#222222]">ao carrinho</span>
         </button>
