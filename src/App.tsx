@@ -251,7 +251,7 @@ export default function App() {
                   <span className={`text-[13px] font-bold ${isShippingFree ? 'text-[#00BFA5]' : 'text-[#222222]'}`}>
                     {isShippingFree ? 'Frete grátis' : 'R$ 8,93'}
                   </span>
-                  <span className="text-[11px] text-[#555555]">Receba até 26 de fev - 4 de mar</span>
+                  <span className="text-[11px] text-[#555555]">Receba em até 2 a 4 dias</span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-[#888888]" />
               </div>
