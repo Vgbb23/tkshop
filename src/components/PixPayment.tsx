@@ -23,6 +23,18 @@ export default function PixPayment({ isOpen, onClose, price, quantity, customer 
   const [isLoadingCharge, setIsLoadingCharge] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [generatedAt, setGeneratedAt] = useState<Date | null>(null);
+  const [hasAttemptedCharge, setHasAttemptedCharge] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    setTimeLeft(86399);
+    setCopied(false);
+    setPixCode('');
+    setIsLoadingCharge(false);
+    setErrorMessage(null);
+    setGeneratedAt(null);
+    setHasAttemptedCharge(false);
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -45,15 +57,17 @@ export default function PixPayment({ isOpen, onClose, price, quantity, customer 
   
   useEffect(() => {
     if (!isOpen) return;
-    if (pixCode || isLoadingCharge) return;
+    if (pixCode || isLoadingCharge || hasAttemptedCharge) return;
 
     const hasMissingData = !customer.name || !customer.email || !customer.phone || !customer.cpf;
     if (hasMissingData) {
       setErrorMessage('Preencha nome, e-mail, telefone e CPF para gerar o PIX.');
       setPixCode('');
+      setHasAttemptedCharge(true);
       return;
     }
 
+    setHasAttemptedCharge(true);
     setErrorMessage(null);
     setIsLoadingCharge(true);
     setPixCode('');
@@ -84,6 +98,7 @@ export default function PixPayment({ isOpen, onClose, price, quantity, customer 
     customer.cpf,
     pixCode,
     isLoadingCharge,
+    hasAttemptedCharge,
   ]);
 
   const handleCopy = () => {
