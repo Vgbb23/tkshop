@@ -132,7 +132,7 @@ export default function AddressForm({ isOpen, onClose, onSave }: AddressFormProp
                 value={formData.phone}
                 onChange={handleChange}
                 maxLength={15}
-                className="flex-1 text-[14px] text-[#222222] placeholder:text-[#CCCCCC] outline-none"
+                className="flex-1 text-[16px] text-[#222222] placeholder:text-[#CCCCCC] outline-none"
               />
             </div>
             <div className="py-4">
@@ -142,7 +142,7 @@ export default function AddressForm({ isOpen, onClose, onSave }: AddressFormProp
                 placeholder="E-mail" 
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full text-[14px] text-[#222222] placeholder:text-[#CCCCCC] outline-none"
+                className="w-full text-[16px] text-[#222222] placeholder:text-[#CCCCCC] outline-none"
               />
             </div>
           </section>
@@ -159,7 +159,7 @@ export default function AddressForm({ isOpen, onClose, onSave }: AddressFormProp
                 value={formData.cep}
                 onChange={handleCepChange}
                 maxLength={9}
-                className="w-full text-[14px] text-[#222222] placeholder:text-[#CCCCCC] outline-none"
+                className="w-full text-[16px] text-[#222222] placeholder:text-[#CCCCCC] outline-none"
               />
               {loading && <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-[#FF2D55] border-t-transparent rounded-full animate-spin" />}
             </div>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ChevronLeft, Copy, Clock } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { createFruitfyPixCharge } from '../services/fruitfy';
+import { isPaymentApproved, trackUtmifyEvent, trackVirtualPage } from '../services/utmify';
 
 interface PixPaymentProps {
   isOpen: boolean;
@@ -34,6 +35,11 @@ export default function PixPayment({ isOpen, onClose, price, quantity, customer 
     setErrorMessage(null);
     setGeneratedAt(null);
     setHasAttemptedCharge(false);
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    trackVirtualPage('pagamento_pix');
   }, [isOpen]);
 
   useEffect(() => {
@@ -80,6 +86,21 @@ export default function PixPayment({ isOpen, onClose, price, quantity, customer 
       .then((result) => {
         setPixCode(result.pixCode);
         setGeneratedAt(new Date());
+        trackUtmifyEvent('pix_gerado', {
+          payment_method: 'pix',
+          value: price * quantity,
+          currency: 'BRL',
+          quantity,
+        });
+
+        if (isPaymentApproved(result.response)) {
+          trackUtmifyEvent('pagamento_aprovado', {
+            payment_method: 'pix',
+            value: price * quantity,
+            currency: 'BRL',
+            quantity,
+          });
+        }
       })
       .catch((error) => {
         const message = error instanceof Error ? error.message : 'Não foi possível gerar a cobrança PIX.';

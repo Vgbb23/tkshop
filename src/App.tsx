@@ -10,6 +10,7 @@ import BottomBar from './components/BottomBar';
 import FlashSaleBanner from './components/FlashSaleBanner';
 import Checkout from './components/Checkout';
 import VariationModal from './components/VariationModal';
+import { syncUTMsFromCurrentLocation, trackVirtualPage } from './services/utmify';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('Visão geral');
@@ -72,6 +73,11 @@ export default function App() {
     setIsCouponRedeemed(true);
     setIsShippingFree(true);
   };
+
+  useEffect(() => {
+    syncUTMsFromCurrentLocation();
+    trackVirtualPage('produto');
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {

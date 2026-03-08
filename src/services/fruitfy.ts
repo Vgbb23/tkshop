@@ -1,3 +1,5 @@
+import { getUTMsForTracking } from './utmify';
+
 const FRUITFY_BASE_URL = (import.meta.env.VITE_FRUITFY_API_URL || 'https://api.fruitfy.io').replace(/\/+$/, '');
 const FRUITFY_TOKEN = import.meta.env.VITE_FRUITFY_TOKEN;
 const FRUITFY_STORE_ID = import.meta.env.VITE_FRUITFY_STORE_ID;
@@ -92,6 +94,11 @@ export async function createFruitfyPixCharge(input: FruitfyChargeInput): Promise
     throw new Error('Credenciais Fruitfy ausentes. Configure VITE_FRUITFY_TOKEN, VITE_FRUITFY_STORE_ID e VITE_FRUITFY_PRODUCT_ID.');
   }
 
+  const mergedUTM = {
+    ...getUTMsForTracking(),
+    ...(input.utm || {}),
+  };
+
   const body = {
     name: input.customer.name.trim(),
     email: input.customer.email.trim(),
@@ -105,7 +112,7 @@ export async function createFruitfyPixCharge(input: FruitfyChargeInput): Promise
         quantity: input.quantity || 1,
       },
     ],
-    ...(input.utm ? { utm: input.utm } : {}),
+    ...(Object.keys(mergedUTM).length > 0 ? { utm: mergedUTM } : {}),
   };
 
   let responseBody: unknown;

@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ChevronLeft, MapPin, User, Plus, ChevronRight, ShieldCheck, CreditCard, Circle, Info } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import AddressForm from './AddressForm';
 import CPFModal from './CPFModal';
 import PixPayment from './PixPayment';
+import { trackVirtualPage } from '../services/utmify';
 
 interface ProductData {
   name: string;
@@ -41,6 +42,12 @@ export default function Checkout({ isOpen, onClose, product, timeLeft, selection
   const [savedCPF, setSavedCPF] = useState<string | null>(null);
   const [selectedPayment, setSelectedPayment] = useState<'pix' | 'credit_card'>('pix');
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      trackVirtualPage('checkout');
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
