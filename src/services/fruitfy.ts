@@ -98,6 +98,7 @@ export async function createFruitfyPixCharge(input: FruitfyChargeInput): Promise
     ...getUTMsForTracking(),
     ...(input.utm || {}),
   };
+  const hasUTM = Object.keys(mergedUTM).length > 0;
 
   const body = {
     name: input.customer.name.trim(),
@@ -112,7 +113,8 @@ export async function createFruitfyPixCharge(input: FruitfyChargeInput): Promise
         quantity: input.quantity || 1,
       },
     ],
-    ...(Object.keys(mergedUTM).length > 0 ? { utm: mergedUTM } : {}),
+    ...(hasUTM ? mergedUTM : {}),
+    ...(hasUTM ? { utm: mergedUTM } : {}),
   };
 
   let responseBody: unknown;

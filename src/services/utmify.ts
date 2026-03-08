@@ -1,15 +1,13 @@
 const UTM_STORAGE_KEY = 'tkshop_utm_params';
 
-const UTM_KEYS = [
-  'utm_id',
-  'utm_source',
-  'utm_medium',
-  'utm_campaign',
-  'utm_term',
-  'utm_content',
+const EXTRA_TRACKING_KEYS = new Set([
   'src',
   'sck',
-];
+  'ttclid',
+  'fbclid',
+  'gclid',
+  'msclkid',
+]);
 
 export type UTMParams = Record<string, string>;
 
@@ -48,11 +46,17 @@ export function captureUTMsFromLocation(search = hasWindow() ? window.location.s
   const params = new URLSearchParams(search);
   const utm: UTMParams = {};
 
-  for (const key of UTM_KEYS) {
-    const value = params.get(key);
-    if (value && value.trim()) {
-      utm[key] = value.trim();
-    }
+  for (const [rawKey, rawValue] of params.entries()) {
+    const key = rawKey.trim().toLowerCase();
+    if (!key) continue;
+
+    const isUTMKey = key.startsWith('utm_');
+    const isExtraTrackingKey = EXTRA_TRACKING_KEYS.has(key);
+    if (!isUTMKey && !isExtraTrackingKey) continue;
+
+    const value = rawValue.trim();
+    if (!value) continue;
+    utm[key] = value;
   }
 
   return utm;
